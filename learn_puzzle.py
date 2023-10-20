@@ -1,5 +1,4 @@
 import turtle
-import tkinter as tk
 import random
 
 
@@ -23,11 +22,12 @@ def register_images():
     global screen
     for i in range(len(images)):
         screen.addshape(images[i])
+        
 
 def create_tiles():
     # create board
     # [#,#,#],[#,#,#]........]  2d list
-
+    global tile
     board =[["#" for _ in range(NUM_COLS)] for _ in range(NUM_ROWS)]
 
     for i in range(NUM_ROWS):
@@ -98,9 +98,10 @@ def swap_tile(tile):
 
         draw_board()
 
+
 ######################################################################
 
-def scramble_board():
+def scramble_board(x,y):
     print("scramble clicked" )
     global board, screen
 
@@ -127,11 +128,12 @@ def scramble_board():
 
 
 def creat_scramble_button():
-    global screen , x, y
+    global screen 
     button = turtle.Turtle(images[NUM_ROWS * NUM_COLS])
     button.penup()
     button.goto(0, -240)
-    button.onclick(lambda x, y :scramble_board())
+    # button.onclick(lambda x, y :scramble_board())
+    button.onclick(scramble_board)
 
 
 def main():
@@ -150,7 +152,7 @@ def main():
     board = create_tiles()
     draw_board()
     creat_scramble_button()
-
+    
 
 main()
 turtle.done()
