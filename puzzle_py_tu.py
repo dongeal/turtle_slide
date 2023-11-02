@@ -1,16 +1,17 @@
 import turtle
 import random
-
-
+first = True
+ti=turtle.Turtle()
+ti.ht()
 NUM_ROWS = 3  # Max 4
 NUM_COLS = 3  # Max 4
 TILE_WIDTH = 90  # Actual image size
 TILE_HEIGHT = 90  # Actual image size
 FONT_SIZE = 24
 FONT = ('Helvetica', FONT_SIZE, 'normal')
-SCRAMBLE_DEPTH = 100
-
+SCRAMBLE_DEPTH = 50
 images = []
+
 for i in range(NUM_ROWS * NUM_COLS - 1):
     file = f"number-images/{i+1}.gif" # Use `.format()` instead if needed.
     images.append(file)
@@ -25,7 +26,6 @@ def register_images():
 
 
 
-
 def create_tiles():
     # create board
     # [#,#,#],[#,#,#]........]  2d list
@@ -36,19 +36,39 @@ def create_tiles():
         for j in range(NUM_COLS):
             tile_num = NUM_ROWS * i + j
             tile = turtle.Turtle(images[tile_num])
+            
             tile.penup()
             board[i][j] = tile
                     ##################################################
             def click_callback(x, y, tile = tile):
-                """Passes `tile` to `swap_tile()` function."""
+          
+                """Passes `tile` to `swap_tile()` function.""" 
+
                 return swap_tile(tile)
+            
             tile.onclick(click_callback)
                     ##################################################
     return board
 
+def is_finished():
+    global first
+    f_count =0
+    for i in range(NUM_ROWS):
+        for j in range(NUM_COLS):
+            
+            tile_num = NUM_ROWS * i + j
+            print(images[tile_num])
+            tile = board[i][j]
+            print(tile.shape())
+            if first == False and images[tile_num] == tile.shape() :
+                f_count +=1
+                 
+    if f_count == NUM_COLS  *NUM_ROWS:
+          return True 
+             
 def draw_board():
-    global screen, board
-
+    global screen, board ,ti
+    
     screen.tracer(0)
 
     for i in range(NUM_ROWS):
@@ -56,10 +76,17 @@ def draw_board():
             tile = board[i][j]
             tile.showturtle()
             tile.goto(-138 + j * (TILE_WIDTH +2), 138 - i *(TILE_HEIGHT +2))
+            
     screen.tracer(1)
 
+    if is_finished():
+        
+        ti.pencolor('red')
+        ti.write('Puzzle Solved', font=('Helvetica',40),align="center")
+        # turtle.hideturtle()
+        # turtle.pencolor('red')
+        # turtle.write('Puzzle Solved', font=('Helvetica',40),align="center")
 
-######################################################################
 def find_empty_square_pos():
     """Returns the position of the empty square."""
     global board
@@ -86,30 +113,30 @@ def is_adjacent(el1, el2):
 
 def swap_tile(tile):
     """Swaps the position of the clicked tile with the empty tile."""
-    global screen
-
+    global screen, empty_square
     current_i, current_j = index_2d(board, tile)
     empty_i, empty_j = find_empty_square_pos()
-    empty_square = board[empty_i][empty_j]
+    # empty_square = board[empty_i][empty_j]
 
     if is_adjacent([current_i, current_j], [empty_i, empty_j]):
         temp = board[empty_i][empty_j]
         board[empty_i][empty_j] = tile
         board[current_i][current_j] = temp
-
+        
         draw_board()
+     
 
-
-######################################################################
-
+        
 def scramble_board(x,y):
     print("scramble clicked" )
-    global board, screen
-
+    global board, screen, first, empty_square
+    
+    first = False
     for i in range(SCRAMBLE_DEPTH):
         for row in board:
             for candidate in row:
                 if candidate.shape() == "number-images/empty.gif":
+                    
                     empty_square = candidate
         
         empty_i, empty_j = find_empty_square_pos()
@@ -126,8 +153,7 @@ def scramble_board(x,y):
         if direction == "down": swap_tile(board[empty_i + 1][empty_j])
         if direction == "left": swap_tile(board[empty_i][empty_j - 1])
         if direction == "right": swap_tile(board[empty_i][empty_j + 1])
-
-
+    
 def creat_scramble_button():
     global screen 
     button = turtle.Turtle(images[NUM_ROWS * NUM_COLS])
@@ -137,8 +163,9 @@ def creat_scramble_button():
     button.onclick(scramble_board)
 
 
+
 def main():
-    global screen, board
+    global screen, board 
 
     # 스크린 설정
     screen = turtle.Screen()
@@ -151,8 +178,12 @@ def main():
     # initial game and display
 
     board = create_tiles()
+    
     draw_board()
+
+    
     creat_scramble_button()
+    
     
 
 main()
